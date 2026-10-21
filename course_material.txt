@@ -1,0 +1,62 @@
+[Search] Breadth-first search
+Breadth-first search expands the shallowest unexpanded node first using a FIFO queue. It is complete, and optimal when all step costs are equal, but its space complexity is O(b^d), which makes memory the main bottleneck.
+
+[Search] Depth-first search
+Depth-first search expands the deepest unexpanded node first using a LIFO stack. It needs only O(bm) memory, but it is neither complete in infinite or cyclic state spaces nor optimal.
+
+[Search] Uniform-cost search
+Uniform-cost search expands the node with the lowest path cost g(n) using a priority queue. It is optimal for any positive step costs.
+
+[Search] A* search
+A* search evaluates nodes using f(n) = g(n) + h(n), where g(n) is the cost so far and h(n) is the estimated cost to the goal. A* is optimal when the heuristic is admissible, meaning it never overestimates the true cost to reach the goal.
+
+[Search] Greedy best-first search
+Greedy best-first search expands the node that appears closest to the goal using only h(n). It is fast, but it is not optimal and it can get stuck in loops.
+
+[Search] Adversarial search
+Minimax is an adversarial search algorithm for two-player zero-sum games in which MAX tries to maximize the utility and MIN tries to minimize it. Alpha-beta pruning skips branches that cannot affect the final decision, and with perfect move ordering it reduces the time complexity from O(b^m) to O(b^(m/2)).
+
+[Knowledge] Knowledge-based agents
+A knowledge-based agent maintains a knowledge base (KB) of sentences written in a formal language. The agent uses TELL to add percepts to the KB and ASK to query it, and an inference engine derives new sentences from the KB.
+
+[Knowledge] Resolution
+Resolution is an inference rule that is refutation-complete for propositional logic. To prove that a sentence follows from the KB, it adds the negation of the sentence to the KB in conjunctive normal form and tries to derive the empty clause.
+
+[Knowledge] Forward and backward chaining
+Forward chaining is a data-driven inference method for Horn clauses that starts from known facts and fires every rule whose premises are satisfied. Backward chaining is goal-driven and works backward from the query.
+
+[Planning] Planning agents
+A planning agent finds a sequence of actions that achieves a goal from an initial state. Classical planning problems are described in PDDL, the Planning Domain Definition Language, in which every action has preconditions and effects.
+
+[LLM] Transformer architecture
+The Transformer architecture was introduced in the 2017 paper Attention Is All You Need by Vaswani et al. It replaced recurrence with self-attention, which allows all tokens in a sequence to be processed in parallel.
+
+[LLM] Self-attention
+In self-attention, each token is projected into a query, a key, and a value vector. The attention weights are computed as softmax(QK^T / sqrt(d_k)) and are used to take a weighted sum of the value vectors. Dividing by sqrt(d_k) keeps the dot products from growing too large.
+
+[LLM] Multi-head attention and positional encoding
+Multi-head attention runs several attention operations in parallel so that the model can attend to information from different representation subspaces. Because self-attention has no notion of order, positional encodings are added to the token embeddings.
+
+[LLM] Encoder-decoder architecture
+The original Transformer has an encoder and a decoder. The encoder maps the input into contextual representations, and the decoder generates the output one token at a time using masked self-attention and cross-attention over the encoder output. Encoder-only models such as BERT are well suited for understanding tasks, while decoder-only models such as GPT are used for text generation.
+
+[LLM] BERT
+BERT, which stands for Bidirectional Encoder Representations from Transformers, is an encoder-only model pretrained with masked language modeling and next sentence prediction. It was released by Google in 2018.
+
+[LLM] DistilBERT
+DistilBERT is a smaller version of BERT created using knowledge distillation. It has 40% fewer parameters and runs 60% faster while retaining about 97% of the language understanding performance of BERT.
+
+[LLM] Large language models
+A large language model is a transformer-based neural network with billions of parameters, trained on massive text corpora to predict the next token. Examples include GPT and LLaMA. Hallucination occurs when a generative model produces fluent but factually incorrect text.
+
+[LLM] Prompt engineering
+Prompt engineering is the practice of designing inputs that guide an LLM toward the desired output. Few-shot prompting includes a handful of examples in the prompt, while chain-of-thought prompting asks the model to reason step by step.
+
+[LLM] Retrieval-augmented generation
+Retrieval-augmented generation, or RAG, combines a retriever with a generator. Relevant documents are retrieved from an external knowledge source and added to the prompt, which reduces hallucination and lets the model use up-to-date information.
+
+[LLM] Question answering
+Extractive question answering selects a span of text from a given passage as the answer, whereas generative question answering writes the answer in free text. Extractive models predict a start position and an end position for the answer span, and they are commonly evaluated with Exact Match and F1 on the SQuAD dataset.
+
+[LLM] Summarization and sentiment analysis
+Text summarization can be extractive, selecting important sentences, or abstractive, generating new sentences. Sentiment analysis classifies a piece of text as positive, negative, or neutral.

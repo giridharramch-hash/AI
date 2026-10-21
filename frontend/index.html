@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Extractive QA on Course Material | AI Mini-Capstone 25CS301</title>
+  <meta name="description" content="Extractive Question Answering on AI Course Material using a Pretrained DistilBERT Transformer Encoder. Explore the live interactive demo, attention heatmaps, and empirical evaluation." />
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- KaTeX CSS for LaTeX rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" />
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- Chart.js and KaTeX JS -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <!-- Project Configuration & App Logic -->
+  <script defer src="js/config.js"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body>
+
+  <!-- Graceful Fallback Banner -->
+  <div id="fallbackBanner" class="fallback-banner" style="display: none;"></div>
+
+  <!-- Sticky Top Navigation -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="#hero" class="nav-brand">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-blue);"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>Course QA</span>
+        <span class="nav-brand-badge">25CS301</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#demo" class="nav-link">Live Demo</a></li>
+          <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+          <li><a href="#attention" class="nav-link">Self-Attention</a></li>
+          <li><a href="#results" class="nav-link">Evaluation</a></li>
+          <li><a href="#passages" class="nav-link">Course Material</a></li>
+          <li><a href="#scope" class="nav-link">Scope</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Dark Mode Toggle -->
+        <button id="themeToggle" class="btn-icon" aria-label="Toggle dark mode" title="Toggle Theme">
+          <span id="themeIcon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </span>
+        </button>
+
+        <a id="navPosterBtn" href="/api/poster" target="_blank" class="btn btn-secondary" style="padding: 7px 14px; font-size: 0.82rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Poster PDF
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero">
+    <div class="container hero-content">
+      <div class="hero-badges">
+        <span class="badge badge-navy">Artificial Intelligence 25CS301</span>
+        <span class="badge badge-blue">DistilBERT Encoder (66M)</span>
+        <span class="badge badge-blue">TF-IDF Retriever</span>
+        <span class="badge badge-muted">SQuAD v1.1 Fine-Tuned</span>
+        <span class="badge badge-success">Hit@1 = 100%</span>
+      </div>
+
+      <h1 class="hero-title">
+        Extractive Question Answering on Course Material
+      </h1>
+
+      <p class="hero-subtitle">
+        Artificial Intelligence (25CS301) &nbsp;·&nbsp; Topic 3.4: LLMs and Transformer Models.<br/>
+        Pinpoint exact factual answers copied directly from course lecture notes with model confidence and verified source passages.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#demo" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Try the Live Demo
+        </a>
+        <a href="#how-it-works" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          How It Works
+        </a>
+      </div>
+
+      <!-- Animated Typing Demo Simulator -->
+      <div class="hero-demo-box">
+        <div class="hero-demo-bar">
+          <span>Real-Time Extractive Pipeline Simulator</span>
+          <span style="font-family: var(--font-mono); color: var(--color-blue);">DistilBERT QA Head</span>
+        </div>
+        <div class="hero-typing-q">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-blue);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span id="heroTypingQuestion">Which company released BERT?</span>
+          <span class="hero-typing-cursor"></span>
+        </div>
+        <div id="heroPassageText" class="hero-passage-preview">
+          BERT, which stands for Bidirectional Encoder Representations from Transformers, is an encoder-only model pretrained with masked language modeling and next sentence prediction. It was released by Google in 2018.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Demo Section (Centerpiece) -->
+  <section id="demo" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Interactive Pipeline</span>
+        <h2 class="section-title">Live Question Answering Demo</h2>
+        <p class="section-subtitle">
+          Query 21 passages covering Search, Knowledge Representation, Classical Planning, and Transformers.
+        </p>
+      </div>
+
+      <div class="demo-card">
+        <!-- Search and Controls -->
+        <div class="demo-controls">
+          <div class="search-bar-wrap">
+            <div class="search-input-box">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-faint);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input 
+                id="demoQuestionInput" 
+                type="text" 
+                placeholder="Ask any question from the lecture notes (e.g. Which company released BERT?)..." 
+                autocomplete="off" 
+              />
+              <button id="demoClearBtn" class="btn-icon" style="border: none; padding: 4px;" title="Clear input">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <button id="demoSearchBtn" class="btn btn-primary" style="padding: 0 24px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span>Ask Model</span>
+            </button>
+          </div>
+
+          <!-- Bottom Action Bar: Top-K & Compare Toggle -->
+          <div class="search-actions-bar">
+            <div class="top-k-selector">
+              <span>Retriever Passages (k):</span>
+              <div class="segmented-group">
+                <button class="segmented-btn top-k-btn" data-k="1">k = 1</button>
+                <button class="segmented-btn top-k-btn active" data-k="3">k = 3</button>
+                <button class="segmented-btn top-k-btn" data-k="5">k = 5</button>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: var(--text-muted);">
+                <input id="compareBaselineToggle" type="checkbox" checked style="accent-color: var(--color-blue);" />
+                <span>Compare with Sentence Baseline</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Example Question Chips -->
+        <div class="chips-container">
+          <span class="chips-label">Try example:</span>
+          <div id="exampleChips" style="display: contents;">
+            <!-- Dynamically populated from config.js -->
+          </div>
+        </div>
+
+        <!-- Loading Skeleton -->
+        <div id="demoLoadingSkeleton" style="display: none; margin-top: 24px;">
+          <div class="skeleton skeleton-text" style="width: 40%; height: 32px; margin-bottom: 16px;"></div>
+          <div class="skeleton skeleton-text" style="width: 100%; height: 18px;"></div>
+          <div class="skeleton skeleton-text" style="width: 85%; height: 18px;"></div>
+          <div class="skeleton skeleton-text" style="width: 70%; height: 18px;"></div>
+        </div>
+
+        <!-- Result Card -->
+        <div id="demoResultCard" class="result-card" style="display: none;">
+          <div class="result-header">
+            <div>
+              <div class="result-answer-label">Extracted Answer Span</div>
+              <div id="resAnswerText" class="result-answer-text">Google</div>
+            </div>
+
+            <!-- Confidence Bar -->
+            <div class="confidence-box">
+              <div class="confidence-header">
+                <span style="color: var(--text-muted);">Model Confidence:</span>
+                <span id="resConfidenceVal" class="confidence-val">0.993</span>
+              </div>
+              <div class="confidence-meter-bg">
+                <div id="resConfidenceFill" class="confidence-meter-fill" style="width: 99%;"></div>
+              </div>
+              <div id="resConfidenceWarning" class="confidence-warning" style="display: none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>Low confidence (< 0.20). Verify against source!</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Source Passage with Answer Highlight -->
+          <div class="passage-display-box">
+            <div class="passage-source-tag">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span id="resSourceTag">[LLM] BERT (Passage #14)</span>
+            </div>
+            <p id="resPassageText" class="passage-text">
+              BERT, which stands for Bidirectional Encoder Representations from Transformers, is an encoder-only model pretrained with masked language modeling and next sentence prediction. It was released by <mark class="answer-span-highlight">Google</mark> in 2018.
+            </p>
+          </div>
+
+          <!-- Comparison Side-by-Side (Toggleable) -->
+          <div id="comparisonContainer" class="comparison-section">
+            <h4 style="font-size: 0.9rem; margin-bottom: 4px;">Baseline Comparison (Span vs Full Sentence)</h4>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">
+              The transformer encoder selects exact boundary indices, whereas the TF-IDF baseline retrieves an entire sentence.
+            </p>
+            <div class="comparison-grid">
+              <div class="compare-card winner">
+                <div class="compare-header">
+                  <span class="compare-title">DistilBERT Transformer Reader</span>
+                  <span class="badge badge-blue">Exact Span</span>
+                </div>
+                <div id="compareTransformerAns" class="compare-body" style="font-weight: 700; color: var(--color-blue); margin-bottom: 6px;">"Google"</div>
+                <div id="compareTransformerConf" style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted);">Confidence: 0.993</div>
+              </div>
+
+              <div class="compare-card">
+                <div class="compare-header">
+                  <span class="compare-title">TF-IDF Sentence Baseline</span>
+                  <span class="badge badge-muted">Whole Sentence</span>
+                </div>
+                <div id="compareBaselineAns" class="compare-body" style="margin-bottom: 6px;">"It was released by Google in 2018."</div>
+                <div id="compareBaselineConf" style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted);">Cosine Sim: 0.512</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Collapsible Under the Hood -->
+          <button id="underTheHoodToggle" class="accordion-toggle" type="button">
+            <span>Under the Hood: Retrieved Candidates & Token Logits</span>
+            <svg class="accordion-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform var(--transition-fast);"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          
+          <div id="underTheHoodContent" class="accordion-content">
+            <h5 style="font-size: 0.85rem; margin-bottom: 8px;">Top-k Passages Retrieved by TF-IDF & Reader Predictions</h5>
+            <div style="overflow-x: auto;">
+              <table class="candidates-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Course Passage</th>
+                    <th>TF-IDF Score</th>
+                    <th>Extracted Span</th>
+                    <th>Reader Conf</th>
+                  </tr>
+                </thead>
+                <tbody id="candidatesTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Start / End Boundary Token Probabilities -->
+            <div id="inspectionTokensBox" style="margin-top: 16px;">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">System Architecture</span>
+        <h2 class="section-title">The Extractive QA Pipeline</h2>
+        <p class="section-subtitle">
+          From natural language question to exact span extraction in four modular stages. Click any step to inspect technical details.
+        </p>
+      </div>
+
+      <div class="pipeline-steps-grid">
+        <!-- Step 1 -->
+        <div class="step-card" data-step="1">
+          <div class="step-number">01</div>
+          <h3 class="step-title">Question Input</h3>
+          <p class="step-desc">
+            Natural language prompt received from student or evaluator.
+          </p>
+          <div class="step-detail">
+            <strong>Input Format:</strong> Validated string up to 500 chars. Special characters preserved for tokenization.
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card" data-step="2">
+          <div class="step-number">02</div>
+          <h3 class="step-title">TF-IDF Retriever</h3>
+          <p class="step-desc">
+            Sublinear TF-IDF with 1-2 n-grams ranks the corpus by cosine similarity.
+          </p>
+          <div class="step-detail">
+            <strong>Filtering:</strong> Returns top-k candidate passages. Sublinear term frequency damping prevents frequent terms from dominating.
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card" data-step="3">
+          <div class="step-number">03</div>
+          <h3 class="step-title">DistilBERT Encoder</h3>
+          <p class="step-desc">
+            Passes <code>[CLS] question [SEP] passage [SEP]</code> through 6 transformer layers.
+          </p>
+          <div class="step-detail">
+            <strong>Contextualizing:</strong> 66M parameters, 12 attention heads. Computes rich bidirectional embeddings for every subword token in parallel.
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card" data-step="4">
+          <div class="step-number">04</div>
+          <h3 class="step-title">QA Head & Argmax</h3>
+          <p class="step-desc">
+            Linear layer predicts start and end logits for every token position.
+          </p>
+          <div class="step-detail">
+            <strong>Span Selection:</strong> Answer span $(i, j)$ with $i \le j$ maximises $P(\text{start}=i) \times P(\text{end}=j)$ with max span length of 30 tokens.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Self-Attention Explainer Section -->
+  <section id="attention" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Mathematical Foundations</span>
+        <h2 class="section-title">Self-Attention Mechanism</h2>
+        <p class="section-subtitle">
+          How tokens contextualize their representations by attending to all other tokens simultaneously.
+        </p>
+      </div>
+
+      <!-- KaTeX Formula Banner -->
+      <div class="math-formula-box">
+        <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em;">Scaled Dot-Product Attention Formula</span>
+        <div id="katexAttentionFormula" class="formula-render">
+          <!-- KaTeX will inject LaTeX here -->
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 600px; margin: 0 auto;">
+          Vaswani et al., <em>Attention Is All You Need</em> (2017). Each token generates a Query ($Q$), Key ($K$), and Value ($V$) vector.
+        </p>
+      </div>
+
+      <!-- Heatmap and Explanations -->
+      <div class="attention-grid-layout">
+        <!-- Interactive Heatmap Card -->
+        <div class="heatmap-card">
+          <div class="heatmap-controls">
+            <div>
+              <h3 style="font-size: 1.05rem; font-weight: 700;">Live Attention Heatmap</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">Seed 0 toy embeddings (rows = Query, cols = Key)</p>
+            </div>
+
+            <!-- Slider for d_k -->
+            <div class="slider-group">
+              <label for="dkSlider"><strong>d_k:</strong> <span id="dkValue">4</span></label>
+              <input id="dkSlider" type="range" min="1" max="64" value="4" step="1" />
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.82rem;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input id="scaleToggle" type="checkbox" checked style="accent-color: var(--color-blue);" />
+              <span>Scale scores by $\sqrt{d_k}$</span>
+            </label>
+            <button id="toggleFallbackImgBtn" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;">
+              Compare with Python PNG
+            </button>
+          </div>
+
+          <!-- Heatmap Grid -->
+          <div id="heatmapTableWrap" class="heatmap-table-wrap">
+            <!-- Heatmap table generated by JS -->
+          </div>
+
+          <div id="heatmapCellDetail" style="font-size: 0.82rem; color: var(--color-blue); min-height: 24px; text-align: center; margin-top: 8px;">
+            Hover over any cell to see query &rarr; key attention weight.
+          </div>
+
+          <!-- Fallback Image Viewer -->
+          <div id="attentionFallbackWrap" style="display: none; margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px; text-align: center;">
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Static Matplotlib reference generated by <code>attention_demo.py</code>:</p>
+            <img src="attention_toy.png" alt="Toy Self-Attention Heatmap" style="max-width: 240px; border-radius: 8px; border: 1px solid var(--border-color);" />
+          </div>
+        </div>
+
+        <!-- Plain English Conceptual Cards -->
+        <div class="concept-cards-grid">
+          <div class="concept-card">
+            <h4 class="concept-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Query, Key, and Value
+            </h4>
+            <p class="concept-card-text">
+              Like a database lookup: <strong>Query</strong> is what a token is looking for; <strong>Key</strong> is what each candidate token offers; <strong>Value</strong> is the semantic content aggregated via weighted sum.
+            </p>
+          </div>
+
+          <div class="concept-card">
+            <h4 class="concept-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              Why divide by &radic;d_k?
+            </h4>
+            <p class="concept-card-text">
+              For large dimension $d_k$, the dot products grow in magnitude, pushing the softmax function into regions with extremely small gradients and near one-hot distributions. Scaling stabilizes training variance.
+            </p>
+          </div>
+
+          <div class="concept-card">
+            <h4 class="concept-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+              Multi-Head Attention
+            </h4>
+            <p class="concept-card-text">
+              Rather than computing attention once, DistilBERT runs 12 attention heads in parallel. This allows the model to jointly attend to syntactic dependencies, co-reference, and factual relations in separate subspaces.
+            </p>
+          </div>
+
+          <div class="concept-card">
+            <h4 class="concept-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Positional Encodings
+            </h4>
+            <p class="concept-card-text">
+              Because self-attention operations are permutation-invariant (having no inherent notion of sequence order), learned positional encodings are added to token embeddings so word ordering is preserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results & Evaluation Section -->
+  <section id="results" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Quantitative Evaluation</span>
+        <h2 class="section-title">Empirical Results & Ablation</h2>
+        <p class="section-subtitle">
+          Evaluated on 28 ground-truth test questions across Search, Knowledge Representation, Classical Planning, and LLMs.
+        </p>
+      </div>
+
+      <!-- Metric Cards (Loaded from results.json) -->
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-label">Exact Match (EM)</div>
+          <div id="metricEM" class="metric-val">53.6%</div>
+          <div class="metric-desc">Normalized string match</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">F1 Token Score</div>
+          <div id="metricF1" class="metric-val">62.2%</div>
+          <div class="metric-desc">Precision & recall overlap</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Contains (Lenient)</div>
+          <div id="metricContains" class="metric-val">57.1%</div>
+          <div class="metric-desc">Gold answer in span</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Retriever Hit@k</div>
+          <div id="metricHit" class="metric-val">100.0%</div>
+          <div class="metric-desc">Gold passage in top-k</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Mean Latency</div>
+          <div id="metricLatency" class="metric-val">264 ms</div>
+          <div class="metric-desc">Per question on CPU</div>
+        </div>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="charts-grid">
+        <!-- Chart 1: Grouped Bar Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">TF-IDF Baseline vs DistilBERT Reader</h3>
+            <span class="badge badge-blue">SQuAD Metrics</span>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="chartBaselineVsTransformer" aria-label="Grouped Bar Chart Comparing Baseline and Transformer"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Top-K Ablation -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Top-k Retrieval Ablation (k = 1, 3, 5)</h3>
+            <span class="badge badge-muted">Passage Tradeoff</span>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="chartTopKAblation" aria-label="Top-k Ablation Chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Per-Unit Breakdown Chart -->
+      <div class="chart-card" style="margin-bottom: 32px;">
+        <div class="chart-header">
+          <h3 class="chart-title">Per-Unit Performance Breakdown</h3>
+          <span class="badge badge-muted">Search, Knowledge, Planning, LLM</span>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="chartPerUnitBreakdown" aria-label="Per-Unit Breakdown Chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Error Analysis Table -->
+      <div class="error-table-card">
+        <div class="error-filter-bar">
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 700;">Error Analysis & Diagnostics</h3>
+            <p style="font-size: 0.82rem; color: var(--text-muted);">
+              Diagnosing failure modes: retrieval miss (passage not in top-k) vs reader error (over-long or misaligned span).
+            </p>
+          </div>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <select id="errorUnitFilter" style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-size: 0.82rem;">
+              <option value="ALL">All Units</option>
+              <option value="Search">Search</option>
+              <option value="Knowledge">Knowledge</option>
+              <option value="Planning">Planning</option>
+              <option value="LLM">LLM</option>
+            </select>
+
+            <select id="errorTypeFilter" style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-size: 0.82rem;">
+              <option value="ALL">All Error Types</option>
+              <option value="reader">Reader Errors</option>
+              <option value="retrieval">Retrieval Misses</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="error-table-wrap">
+          <table class="error-table">
+            <thead>
+              <tr>
+                <th>Unit</th>
+                <th>Question</th>
+                <th>Gold Target Answer</th>
+                <th>Predicted Answer</th>
+                <th>Diagnosis</th>
+              </tr>
+            </thead>
+            <tbody id="errorTableBody">
+              <!-- Dynamically populated from results.json -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Course Material Browser Section -->
+  <section id="passages" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Corpus Explorer</span>
+        <h2 class="section-title">Course Material Browser</h2>
+        <p class="section-subtitle">
+          Browse and search through all 21 structured passages from Artificial Intelligence 25CS301.
+        </p>
+      </div>
+
+      <div class="browser-controls">
+        <div class="search-input-box" style="max-width: 400px; padding: 0 12px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-faint);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="passageSearchInput" type="text" placeholder="Filter passages by topic or text..." style="padding: 10px 8px;" />
+        </div>
+
+        <div class="chips-container">
+          <button class="chip-btn unit-filter-pill active" data-unit="ALL">All Units (21)</button>
+          <button class="chip-btn unit-filter-pill" data-unit="Search">Search (6)</button>
+          <button class="chip-btn unit-filter-pill" data-unit="Knowledge">Knowledge (3)</button>
+          <button class="chip-btn unit-filter-pill" data-unit="Planning">Planning (1)</button>
+          <button class="chip-btn unit-filter-pill" data-unit="LLM">LLM (11)</button>
+        </div>
+      </div>
+
+      <div id="passagesGrid" class="passages-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Limitations & Future Scope Section -->
+  <section id="scope" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Critical Analysis</span>
+        <h2 class="section-title">Limitations & Future Scope</h2>
+        <p class="section-subtitle">
+          Honest reflection on extractive QA constraints and next-generation improvements.
+        </p>
+      </div>
+
+      <div class="scope-columns">
+        <!-- Column 1: Limitations -->
+        <div class="scope-card">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <div class="scope-icon-wrap icon-warning">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Current System Limitations</h3>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Inherent boundary constraints of extractive span prediction on curated course notes.
+          </p>
+
+          <ul class="scope-list">
+            <li class="scope-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #d97706; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span><strong>Span Continuity:</strong> The answer must exist as a contiguous substring of a single passage. The system cannot rephrase or format bullets.</span>
+            </li>
+            <li class="scope-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #d97706; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span><strong>Multi-Hop Reasoning:</strong> Cannot combine distinct facts located in separate passages (e.g. comparing A* space complexity against BFS).</span>
+            </li>
+            <li class="scope-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #d97706; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span><strong>Confident Hallucination:</strong> A model fine-tuned on SQuAD v1.1 always returns a span, even for out-of-domain questions, sometimes with high confidence.</span>
+            </li>
+            <li class="scope-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #d97706; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span><strong>Test Set Scale:</strong> The current benchmark has 28 curated questions. While retriever Hit@1 is 100%, broader test sets with paraphrases reveal reader sensitivity.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Column 2: Future Scope -->
+        <div class="scope-card">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <div class="scope-icon-wrap icon-future">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Future Roadmap & Extensions</h3>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Architectural evolutions toward production-grade course QA and generative RAG.
+          </p>
+
+          <ul class="scope-list">
+            <li class="scope-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-blue); flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+              <span><strong>Dense Bi-Encoder Retrieval:</strong> Replace TF-IDF sparse vectors with semantic embeddings (e.g. <code>bge-small-en-v1.5</code> or Contriever) for paraphrase resilience.</span>
+            </li>
+            <li class="scope-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-blue); flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+              <span><strong>SQuAD 2.0 No-Answer Handling:</strong> Train on unanswerable questions to enable an explicit "I don't know" threshold instead of forcing a span.</span>
+            </li>
+            <li class="scope-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-blue); flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+              <span><strong>Course-Specific Fine-Tuning:</strong> Fine-tune DistilBERT directly on past university midterm and final exam Q&A datasets.</span>
+            </li>
+            <li class="scope-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-blue); flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+              <span><strong>Generative RAG with Citation Grounding:</strong> Feed top retrieved spans into a quantized local generative model (e.g. LLaMA-3-8B) with passage citations.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h3>Extractive QA Capstone</h3>
+          <p>
+            AI Mini-Capstone Project for Artificial Intelligence (25CS301).<br/>
+            Topic 3.4: Large Language Models and Transformer Architectures.<br/>
+            Built with DistilBERT, PyTorch, Hugging Face Transformers, and FastAPI.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Team Members</h4>
+          <ul id="footerTeamList" class="footer-team-list">
+            <!-- Dynamically populated from config.js -->
+            <li>Giridharram</li>
+            <li>Team Member 2</li>
+            <li>Team Member 3</li>
+            <li>Team Member 4</li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Project Links</h4>
+          <ul class="footer-links">
+            <li><a id="downloadPosterBtn" href="/api/poster" target="_blank">Download Technical Poster (PDF)</a></li>
+            <li><a id="footerGithubLink" href="#" target="_blank">GitHub Repository</a></li>
+            <li><a href="#demo">Interactive Live Demo</a></li>
+            <li><a href="#results">Evaluation Metrics</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          Acknowledgements: Hugging Face Transformers, PyTorch, scikit-learn, DistilBERT, and SQuAD v1.1.
+        </div>
+        <div>
+          &copy; 2026 AI Mini-Capstone (25CS301) · Team 4
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
